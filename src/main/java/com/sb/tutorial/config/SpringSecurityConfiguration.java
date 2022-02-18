@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -42,20 +44,22 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 						//if incorrect JSESSION id passed user will be redirected to /invalid-session
 						.invalidSessionUrl("/invalid-session")
 						//user can login from 1 place only
-						.maximumSessions(1)
+//						.maximumSessions(1)
+						.maximumSessions(-1)
 						//login from other place will not affect the current login, in case of false current login will invalidated
 						.maxSessionsPreventsLogin(true)
 				)
 		      	.logout(logout -> logout
 		      			.deleteCookies("JSESSIONID")
-		      	);
-	}
-	
-	
-	//For session management this publisher comes in handy
-	@Bean
-	public HttpSessionEventPublisher httpSessionEventPublisher() {
-	    return new HttpSessionEventPublisher();
+		      	)
+		      	.rememberMe(remember -> remember
+		      			.key("somerandomkey")
+		      			.tokenValiditySeconds(15)
+		      			.userDetailsService(users())
+		      			.tokenRepository(persistentTokenRepository())
+		      	)
+		      	
+		      	;
 	}
 	
 	//different ways of password storage in spring security
@@ -88,4 +92,10 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return new JdbcUserDetailsManager(dataSource);
 	}
 	
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl jdbcTokenRepositoryImpl = new JdbcTokenRepositoryImpl();
+		jdbcTokenRepositoryImpl.setDataSource(dataSource);
+		return jdbcTokenRepositoryImpl;
+	}
 }

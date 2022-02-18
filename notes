@@ -36,3 +36,10 @@ AuthenticationManager > ProviderManager > AuthenticationProvider (DaoAuthenticat
 AbstractAuthenticationProcessingFilter
 diff types of authetication processing filters are used in order to create a Authentication object from request, which later is passed to AuthenticationManager 
 for example UsernamePasswordAuthenticationFilter
+
+remember me notes
+if user selects remember me while login, after browser closed he can still revisit 
+his session based the remember me token received after login, based on a condition that the remember me token is still valid
+if the token is valid for an hour, you will be remembered for an hour, you dont need to login in that hour
+if you revisit session just before the remember me token expires, the session can go on even if the remember me token expired, but next time you will
+have to re-login
