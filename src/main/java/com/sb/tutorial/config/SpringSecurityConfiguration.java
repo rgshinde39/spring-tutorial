@@ -26,7 +26,9 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http
 			.csrf().disable()
 		      .authorizeRequests()
+		      .antMatchers("/public*").permitAll()
 		      .antMatchers("/login*").permitAll()
+		      .antMatchers("/logout-success*").permitAll()
 		      .anyRequest().authenticated()
 		      .and()
 		      
@@ -51,6 +53,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				)
 		      	.logout(logout -> logout
 		      			.deleteCookies("JSESSIONID")
+		      			.logoutSuccessUrl("/logout-success")
 		      	)
 		      	.rememberMe(remember -> remember
 		      			.key("somerandomkey")
@@ -58,7 +61,8 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		      			.userDetailsService(users())
 		      			.tokenRepository(persistentTokenRepository())
 		      	)
-		      	
+		      	//anonymous is enabled by default to prevent NPE in SecurityContextHolder
+		      	.anonymous()
 		      	;
 	}
 	

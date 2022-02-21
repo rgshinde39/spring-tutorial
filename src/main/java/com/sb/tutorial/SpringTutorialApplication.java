@@ -3,7 +3,10 @@ package com.sb.tutorial;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -37,6 +40,11 @@ public class SpringTutorialApplication {
 	@Bean
 	public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
 		return new SecurityEvaluationContextExtension();
+	}
+	
+	@Bean
+	public AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+		return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
 	}
 	
 	public static void createTestAuthenticatedUser() {

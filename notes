@@ -43,3 +43,19 @@ his session based the remember me token received after login, based on a conditi
 if the token is valid for an hour, you will be remembered for an hour, you dont need to login in that hour
 if you revisit session just before the remember me token expires, the session can go on even if the remember me token expired, but next time you will
 have to re-login
+
+anonymous authentication
+by default all users are given ROLE_ANONYMOUS before they login. we can configure role anonymous to access only public URL,
+this ensures tha at any given point SecurityContextHolder has a Authentication object.
+For anonymous users AnonymouusAuthenticationToken is generated with ROLE_ANONYMOUS role
+AnonymousAuthenticationToken [Principal=anonymousUser, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=6F73F266856B6E4021DD7E32A90682AC], Granted Authorities=[ROLE_ANONYMOUS]]
+
+Logout Handlers
+LogoutHandler, LogoutSuccessHandler, CookieClearingLogoutHandler and more..
+we don't need to implement these handlers ourselves as we have shortcuts for the same in logout element of HttpSecurity configure method
+
+Authorization
+AuthorizationFilter > AuthorizationManager > AuthorizationDecisionManager
+AuthorizationManager reads authorities of Authentication Principal
+AccessDecisionManager checks authorities before invocation(method level or request level) to decide whether to proceed further or not
+we can implement AuthorizationManager to provide custom access decisions
