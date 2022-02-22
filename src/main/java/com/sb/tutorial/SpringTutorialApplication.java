@@ -37,16 +37,6 @@ public class SpringTutorialApplication {
 		//createTestAuthenticatedUser();
 	}
 	
-	@Bean
-	public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-		return new SecurityEvaluationContextExtension();
-	}
-	
-	@Bean
-	public AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-		return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
-	}
-	
 	public static void createTestAuthenticatedUser() {
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		

@@ -59,3 +59,24 @@ AuthorizationFilter > AuthorizationManager > AuthorizationDecisionManager
 AuthorizationManager reads authorities of Authentication Principal
 AccessDecisionManager checks authorities before invocation(method level or request level) to decide whether to proceed further or not
 we can implement AuthorizationManager to provide custom access decisions
+
+Role hierarchy
+instead of defining multiple roles to user, we can define role hierarchy, 
+so that user with higher role can also access requests or methods which requires other roles(lower hierarchy roles)
+for example
+ROLE_ADMIN > ROLE_USER > ROLE_GUEST
+so here admin can access user endpoints and user can access guest endpoints
+hierarchy works downwards only
+
+user's role and authority are the same thing only difference in how we refer them in code or database
+for ex
+hasRole("ADMIN") = hasAuthority("ROLE_ADMIN") in database authority will be stored as 'ROLE_ADMIN'
+ROLE_ prefix is automatically added when we refer to it as role instead of authority like above, this is just for the convenience
+
+a user can have 2 authorities in authorities table ROLE_ADMIN, CAN_DELETE_ACCOUNT
+in code you can use them as follows
+hasRole("ADMIN") = hasAuthority("ROLE_ADMIN")
+hasAuthority("CAN_DELETE_ACCOUNT") 
+
+you cannot use hasRole("CAN_DELETE_ACCOUNT") because ROLE_ prefix is not added in authorities table
+

@@ -3,16 +3,22 @@ package com.sb.tutorial.config;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -26,9 +32,13 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http
 			.csrf().disable()
 		      .authorizeRequests()
+		      .expressionHandler(webSecurityExpressionHandler())
 		      .antMatchers("/public*").permitAll()
 		      .antMatchers("/login*").permitAll()
-		      .antMatchers("/logout-success*").permitAll()
+		      .antMatchers("/logoutsuccess*").permitAll()
+		      .mvcMatchers("/admin*").hasRole("ADMIN")
+		      .mvcMatchers("/user*").hasRole("USER")
+		      .mvcMatchers("/guest*").hasRole("GUEST")
 		      .anyRequest().authenticated()
 		      .and()
 		      
@@ -53,7 +63,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				)
 		      	.logout(logout -> logout
 		      			.deleteCookies("JSESSIONID")
-		      			.logoutSuccessUrl("/logout-success")
+		      			.logoutSuccessUrl("/logoutsuccess")
 		      	)
 		      	.rememberMe(remember -> remember
 		      			.key("somerandomkey")
@@ -94,6 +104,31 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		
 		//here datasource is mandatory
 		return new JdbcUserDetailsManager(dataSource);
+	}
+	
+	@Bean
+	public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+		return new SecurityEvaluationContextExtension();
+	}
+	
+	@Bean
+	public AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+		return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+	}
+	
+	@Bean
+	public RoleHierarchy roleHierarchy() {
+	    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+	    String hierarchy = "ROLE_ADMIN > ROLE_USER \n ROLE_USER > ROLE_GUEST";
+	    roleHierarchy.setHierarchy(hierarchy);
+	    return roleHierarchy;
+	}
+	
+	@Bean
+	public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+	    DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+	    expressionHandler.setRoleHierarchy(roleHierarchy());
+	    return expressionHandler;
 	}
 	
 	@Bean

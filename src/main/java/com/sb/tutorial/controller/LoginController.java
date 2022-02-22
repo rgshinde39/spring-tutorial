@@ -45,7 +45,7 @@ public class LoginController {
 		return "invalid-session";
 	}
 	
-	@GetMapping("/logout-success")
+	@GetMapping("/logoutsuccess")
 	public @ResponseBody String logoutSuccess() {
 		return "logout success";
 	}
