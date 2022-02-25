@@ -10,6 +10,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,6 +23,9 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 
 @Configuration
 @EnableWebSecurity
+
+//without this method level pre post won't work
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired DataSource dataSource;
@@ -36,7 +40,15 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		      .antMatchers("/public*").permitAll()
 		      .antMatchers("/login*").permitAll()
 		      .antMatchers("/logoutsuccess*").permitAll()
-		      .mvcMatchers("/admin*").hasRole("ADMIN")
+		      //.mvcMatchers("/admin*").hasRole("ADMIN")
+		      
+		      //with expression
+		      //.mvcMatchers("/admin*").access("hasRole('ADMIN')")
+
+		      //refering bean
+		      .mvcMatchers("/admin*").access("@checkUserRole.checkAdminRole(authentication, request)")
+		      .mvcMatchers("/user/{userId}").access("@checkUserRole.checkUserId(authentication, #userId)")
+		      
 		      .mvcMatchers("/user*").hasRole("USER")
 		      .mvcMatchers("/guest*").hasRole("GUEST")
 		      .anyRequest().authenticated()

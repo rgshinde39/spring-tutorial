@@ -37,30 +37,30 @@ AbstractAuthenticationProcessingFilter
 diff types of authetication processing filters are used in order to create a Authentication object from request, which later is passed to AuthenticationManager 
 for example UsernamePasswordAuthenticationFilter
 
-remember me notes
+REMEMBER ME NOTES
 if user selects remember me while login, after browser closed he can still revisit 
 his session based the remember me token received after login, based on a condition that the remember me token is still valid
 if the token is valid for an hour, you will be remembered for an hour, you dont need to login in that hour
 if you revisit session just before the remember me token expires, the session can go on even if the remember me token expired, but next time you will
 have to re-login
 
-anonymous authentication
+ANONYMOUS AUTHENTICATION
 by default all users are given ROLE_ANONYMOUS before they login. we can configure role anonymous to access only public URL,
 this ensures tha at any given point SecurityContextHolder has a Authentication object.
 For anonymous users AnonymouusAuthenticationToken is generated with ROLE_ANONYMOUS role
 AnonymousAuthenticationToken [Principal=anonymousUser, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=6F73F266856B6E4021DD7E32A90682AC], Granted Authorities=[ROLE_ANONYMOUS]]
 
-Logout Handlers
+LOGOUT HANDLERS
 LogoutHandler, LogoutSuccessHandler, CookieClearingLogoutHandler and more..
 we don't need to implement these handlers ourselves as we have shortcuts for the same in logout element of HttpSecurity configure method
 
-Authorization
+AUTHORIZATION
 AuthorizationFilter > AuthorizationManager > AuthorizationDecisionManager
 AuthorizationManager reads authorities of Authentication Principal
 AccessDecisionManager checks authorities before invocation(method level or request level) to decide whether to proceed further or not
 we can implement AuthorizationManager to provide custom access decisions
 
-Role hierarchy
+ROLE HIERARCHY
 instead of defining multiple roles to user, we can define role hierarchy, 
 so that user with higher role can also access requests or methods which requires other roles(lower hierarchy roles)
 for example
@@ -79,4 +79,25 @@ hasRole("ADMIN") = hasAuthority("ROLE_ADMIN")
 hasAuthority("CAN_DELETE_ACCOUNT") 
 
 you cannot use hasRole("CAN_DELETE_ACCOUNT") because ROLE_ prefix is not added in authorities table
+
+AUTHORIZE HTTP REQUESTS
+http.authorizeRequests uses FilterSecurityInterceptor while http.authorizeHttpRequests uses AuthorizationFilter(recommended)
+instead of http.authorizeRequests we should use http.authorizeHttpRequests for advantages like bean based support, more customization 
+and delaying authentication till it's absolutely needed
+
+Expression based access control
+we provide spring expression in .access element of antMatchers or mvcMatchers to control access via expression
+for example .antMatchers("/user/**").access("hasRole('admin')")
+we can also combine expressions with 'and' AND 'or'
+
+we can refer beans in expressions
+@beanName.methodName(params) here method should return boolean which help deciding whether user should be allowed access or not
+
+refering path variables
+.antMatchers("/user/{userId}/**").access("@webSecurity.checkUserId(authentication,#userId)")
+
+METHOD LEVEL SECURITY
+enable global method security with following
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+
 
