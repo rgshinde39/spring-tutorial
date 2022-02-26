@@ -1,9 +1,16 @@
 package com.sb.tutorial.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.sb.tutorial.config.NameMatchCheck;
 
 @RestController
 public class TestController {
@@ -35,5 +42,19 @@ public class TestController {
 	@GetMapping("/showDetails")
 	public String showDetails() {
 		return "showDetails";
+	}
+	
+	//we have created meta anotation @NameMatchCheck which confirms that name param matches with currently authenticated user's name
+	@NameMatchCheck
+	@GetMapping("/checkName")
+	public String checkName(@RequestParam String name) {
+		return "checkName "+name;
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	//@PostFilter("filterObject == 'pune'")
+	@GetMapping("/cities")
+	public List<String> getCities() {
+		return Arrays.asList("pune", "delhi", "kolkata");
 	}
 }

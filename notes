@@ -100,4 +100,14 @@ METHOD LEVEL SECURITY
 enable global method security with following
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 
+on method level we can following to make decision
+@PreAuthorize("hasRole('USER')")
 
+with # we can access method arguments as following where name is RequestParam String
+@PreAuthorize("#name == 'james'")
+
+for method level security MethodSecurityInterceptor is used
+for domain object security AspectJSecurityInterceptor is used
+
+DOMAIN OBJECT SECURITY WITH ACL
+we can add security to each domain object (each row in database)

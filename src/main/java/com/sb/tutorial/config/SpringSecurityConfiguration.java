@@ -10,10 +10,11 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -25,7 +26,16 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 @EnableWebSecurity
 
 //without this method level pre post won't work
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
+
+/*
+ * recommended over @EnableGlobalMethodSecurity since spring security 5.6 
+ * this enables method level security by default
+ * i.e @PreAuthorize, @PostAuthorize, @PreFilter, and @PostFilter are enabled by
+ * default you could disable them with prePostEnabled = false and provide custom
+ * implementation where you could only enable what you need like just enable @PreAuthorize
+ */
+@EnableMethodSecurity
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired DataSource dataSource;
@@ -149,4 +159,10 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		jdbcTokenRepositoryImpl.setDataSource(dataSource);
 		return jdbcTokenRepositoryImpl;
 	}
+	
+	//just in case if you don't prefer default 'ROLE_' prefix
+//	@Bean
+//	static GrantedAuthorityDefaults grantedAuthorityDefaults() {
+//		return new GrantedAuthorityDefaults("NEW_PREFIX_");
+//	}
 }
