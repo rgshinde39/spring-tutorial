@@ -66,7 +66,10 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		      
 		      //authentication based on a customizable login form with help of html form
 		      .formLogin()
-		      	.loginPage("/login")
+		      	//.loginPage("/login")
+		      .and()
+		      
+		      .oauth2Login()
 		      .and()
 		      
 		      //if we dont specify any of the methods spring security will throw 403 AccessDeni

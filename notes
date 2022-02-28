@@ -111,3 +111,7 @@ for domain object security AspectJSecurityInterceptor is used
 
 DOMAIN OBJECT SECURITY WITH ACL
 we can add security to each domain object (each row in database)
+
+OAUTH2
+CommonOAuth2Provider enum provides default properties for populer oAuth providers like Google, Facebook, Github and Okta
+Spring boot autoconfigures oAuth2 with OAuth2ClientAutoConfiguration but we can override the same
